@@ -1,32 +1,29 @@
-#include <MX1508.h>
- // Esta instrucción incluye un fichero que nos permite manejar el DRIVER del motor con instrucciones fáciles 
-DRV8833 driver = DRV8833(); // Esta instrucción indica la creación del DRIVER virtual dentro del programa 
-
-// Declaración de variables enteras globales para nombrar los pines: 
-
-int motorA1 = 5 ; //Pin de conexión de los motores.  
-int motorA2 = 6;
-int motorB1 = 11;
-int motorB2 = 3;
-
-int Pot = 0; // Pin de ubicación del potenciómetro 
-int valor; 
+int pinUltrasonido = 4; // Pin de conexión sensor ultrasonido 
+int distancia;
 
 void setup() {
-  // Código de configuración que se ejecuta una sola vez:
-  
-  // Configurar los pines como entradas o como salidas
-  
-  Serial.begin(9600); // Inicia la comunicación con el puerto serial del computador a 9600 baudios
-  driver.attachMotorA(motorA1, motorA2); // Esta instrucción especial ya configura los pines del motor A como salidas
-  driver.attachMotorB(motorB1, motorB2); // Esta instrucción especial ya configura los pines del motor B como salidas
+ Serial.begin(9600); // Inicia la comunicación con el puerto serial del computador a 9600 baudios
 }
 
 void loop() {
-  // Código que se ejecuta de manera repetida:
   
-  valor= analogRead(Pot)/4; //// En cada ciclo que se repite, leer el valor del pin del potenciómetro y almacenarlo en una variable llamada valor
-  driver.motorAForward(valor); // La velocidad de los motores A y B estará indicada por "valor"
-  driver.motorBForward(valor);
-  Serial.println(valor); //Escribir en el puerto serial del computador la variable "valor" 
-  }
+int distancia = obtenerDistancia();  //Se iguala la variable distancia al valor de lectura de la función obetenerDistancia
+
+Serial.print(distancia);  //Escribir en el puerto serial del computador la variable "distancia" 
+Serial.println(" cm"); //Escribir en el puerto serial del computador el texto que se encuentra dentro de las comillas 
+}
+
+int obtenerDistancia()
+{
+  int d;
+  pinMode(pinUltrasonido, OUTPUT);    //Indicar que se usará como salida para generar señal ultrasónica
+  digitalWrite(pinUltrasonido, LOW);  //Asegurarse de que no esté generando señal ultrasónico
+  delayMicroseconds(2);               //Pequeño tiempo de espera para ecos o ruidos iniciales
+  digitalWrite(pinUltrasonido, HIGH); //Generar señal ultrasónica
+  delayMicroseconds(10);              //Pequeño tiempo de generación de señal
+  digitalWrite(pinUltrasonido, LOW);  //Apagar señal ultrasónica
+  pinMode(pinUltrasonido, INPUT);     //Indicar que se usará como entrada para recibir señal ultrasónica ("micrófono")
+  d = pulseIn(pinUltrasonido, HIGH);  //Instrucción para medir el tiempo en que la señal ultrasónica rebota y produce HIGH
+  d = d / 58;                         //Divisíon entre 58 para pasar de tiempo (microsegundos) a distancia (cm) - Valor a calibrar
+  return d;                           //Retorna d para que se pueda almacenar en variable
+}
