@@ -1,29 +1,24 @@
-int pinUltrasonido = 4; // Pin de conexión sensor ultrasonido 
-int distancia;
+int zumbador = 8;
+int sonido =1; 
+int valorSonido; 
 
 void setup() {
- Serial.begin(9600); // Inicia la comunicación con el puerto serial del computador a 9600 baudios
-}
-
-void loop() {
+   // Código de configuración que se ejecuta una sola vez:
   
-int distancia = obtenerDistancia();  //Se iguala la variable distancia al valor de lectura de la función obetenerDistancia
-
-Serial.print(distancia);  //Escribir en el puerto serial del computador la variable "distancia" 
-Serial.println(" cm"); //Escribir en el puerto serial del computador el texto que se encuentra dentro de las comillas 
+  // Configurar los pines como entradas o como salidas
+  
+  pinMode (zumbador, OUTPUT);
 }
-
-int obtenerDistancia()
-{
-  int d;
-  pinMode(pinUltrasonido, OUTPUT);    //Indicar que se usará como salida para generar señal ultrasónica
-  digitalWrite(pinUltrasonido, LOW);  //Asegurarse de que no esté generando señal ultrasónico
-  delayMicroseconds(2);               //Pequeño tiempo de espera para ecos o ruidos iniciales
-  digitalWrite(pinUltrasonido, HIGH); //Generar señal ultrasónica
-  delayMicroseconds(10);              //Pequeño tiempo de generación de señal
-  digitalWrite(pinUltrasonido, LOW);  //Apagar señal ultrasónica
-  pinMode(pinUltrasonido, INPUT);     //Indicar que se usará como entrada para recibir señal ultrasónica ("micrófono")
-  d = pulseIn(pinUltrasonido, HIGH);  //Instrucción para medir el tiempo en que la señal ultrasónica rebota y produce HIGH
-  d = d / 58;                         //Divisíon entre 58 para pasar de tiempo (microsegundos) a distancia (cm) - Valor a calibrar
-  return d;                           //Retorna d para que se pueda almacenar en variable
+void loop() {
+  // Código que se ejecuta de manera repetida:
+  
+  valorSonido = analogRead (sonido);
+  
+  if (valorSonido >= 50) {  
+    tone(zumbador,500); //El método tone le indica al zumbador emitir un sonido a una frecuencia de 500Hz, se puede variar el valor entre más bajo sonidos más graves y entre más alto sonidos más agudos           
+    delay(2000);
+ }
+ else {                      
+  noTone(zumbador);  //El método noTone le indica al zumbador no emitir ningún sonido
+ }
 }
